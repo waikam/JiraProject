@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { cleanObject } from '../../util'
+import { cleanObject, useDebounce } from '../../util'
 import { List } from './list'
 import { SearchPanel } from './search-panel'
 import * as qs from 'qs'
@@ -12,17 +12,18 @@ export const ProjectListScreen = () => {
     name: '',
     personId: ''
   })
+  const debouncedParam = useDebounce(param, 2000);
   const [list, setList] = useState([])
 
   // 当param改变的时候就获取项目列表数据
   useEffect(() => {
-    fetch(`${apiUrl}/projects?${qs.stringify(cleanObject(param))}`)
+    fetch(`${apiUrl}/projects?${qs.stringify(cleanObject(debouncedParam))}`)
     .then(async res => {
       if (res.ok) {
         setList(await res.json())
       }
     })
-  }, [param])
+  }, [debouncedParam])
 
   useEffect(() => {
     fetch(`${apiUrl}/users`).then(async res => {
